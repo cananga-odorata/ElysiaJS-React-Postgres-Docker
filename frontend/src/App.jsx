@@ -70,7 +70,11 @@ function App() {
   return (
     <div className="container">
       <h1>Todo List</h1>
+      <p>Backend powered by: <strong>{window.BACKEND_NAME || '...'}</strong></p>
       <p>ElysiaJS + React + Postgres + Docker</p>
+      {/* <p>Click on a todo to toggle its completion status.</p> */}
+
+      {/* ฟอร์มสำหรับเพิ่ม Todo ใหม่ */}
       
       <form onSubmit={handleAddTodo} className="todo-form">
         <input

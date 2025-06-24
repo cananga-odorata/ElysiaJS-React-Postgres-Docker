@@ -1,0 +1,9 @@
+# .gitignore
+node_modules
+**/node_modules
+.env
+**/.env
+
+
+# macOS system files
+.DS_Store

@@ -1,20 +1,30 @@
-# ใช้ Bun เป็น base image
+# Stage 1: Install dependencies and build Prisma Client
+FROM oven/bun:1 AS builder
+
+# --- FIX: ใช้ apt-get ซึ่งเป็นคำสั่งที่ถูกต้องสำหรับ Image นี้ ---
+RUN apt-get update && apt-get install -y --no-install-recommends openssl
+
+WORKDIR /app
+COPY package.json bun.lockb* ./
+COPY prisma ./prisma/
+
+RUN bun install --frozen-lockfile
+RUN bunx prisma generate
+
+# Stage 2: Create the final image
 FROM oven/bun:1
 
-# ตั้งค่า working directory
+# --- FIX: ติดตั้ง openssl ใน final image ด้วย ---
+RUN apt-get update && apt-get install -y --no-install-recommends openssl
+
 WORKDIR /app
 
-# Copy package.json และ lock file
-COPY package.json bun.lockb* ./
+# Copy สิ่งที่จำเป็นจาก stage แรก
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/prisma ./prisma/
+COPY src ./src
 
-# ติดตั้ง dependencies
-RUN bun install --frozen-lockfile
-
-# Copy โค้ดที่เหลือ
-COPY . .
-
-# เปิด Port 3000 ของ Elysia
 EXPOSE 3000
 
-# รัน dev server
-CMD [ "bun", "run", "dev" ]
+# คำสั่งนี้ถูกต้องแล้ว ไม่ต้องแก้
+CMD sh -c "bunx prisma migrate deploy && bun run src/index.ts"

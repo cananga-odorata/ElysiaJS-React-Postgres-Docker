@@ -1,0 +1,57 @@
+# version: '3.8'
+
+services:
+  # บริการสำหรับฐานข้อมูล Postgres
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_DB=mydb
+    volumes:
+      # Mount script สำหรับสร้างตารางครั้งแรก
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # Mount volume เพื่อเก็บข้อมูลถาวร
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      # เปิด port 5432 ให้เข้าถึงจาก host ได้ (เผื่อใช้โปรแกรมอื่นเชื่อมต่อ)
+      - "5432:5432"
+
+  # บริการสำหรับ Backend (ElysiaJS)
+  backend:
+    build:
+      context: ./backend
+    restart: always
+    ports:
+      # Map port 3000 ใน container ไปที่ 3001 ของเครื่องเรา
+      - "3001:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - DB_HOST=db  # <--- ชี้ไปที่ service 'db'
+      - DB_PORT=5432
+      - DB_NAME=mydb
+      - DB_USER=myuser
+      - DB_PASSWORD=mypassword
+    depends_on:
+      - db # บอกให้ Backend รอจนกว่า DB จะพร้อมทำงาน
+
+  # บริการสำหรับ Frontend (Vite)
+  frontend:
+    build:
+      context: ./frontend
+    restart: always
+    ports:
+      # Map port 5173 ใน container ไปที่ 5173 ของเครื่องเรา
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend # ไม่จำเป็นมาก แต่ดีถ้าอยากให้ Backend พร้อมก่อน
+
+# กำหนด Volume สำหรับเก็บข้อมูล Postgres
+volumes:
+  postgres_data:

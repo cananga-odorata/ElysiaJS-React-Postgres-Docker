@@ -1,15 +1,17 @@
 {
-    "name": "backend",
-    "version": "1.0.0",
+    "name": "backend-prisma",
     "scripts": {
-        "dev": "bun run --watch src/index.ts"
+        "dev": "bun run --watch src/index.ts",
+        "prisma:migrate": "prisma migrate dev",
+        "prisma:generate": "prisma generate"
     },
     "dependencies": {
         "@elysiajs/cors": "^1.0.2",
-        "elysia": "^1.0.22",
-        "postgres": "^3.4.4"
+        "@prisma/client": "^5.15.1",
+        "elysia": "^1.0.22"
     },
     "devDependencies": {
-        "bun-types": "latest"
+        "bun-types": "latest",
+        "prisma": "^5.15.1"
     }
 }

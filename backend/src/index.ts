@@ -8,9 +8,9 @@ const app = new Elysia()
   .use(cors())
   .get('/todos', () => db.todo.findMany({ orderBy: { id: 'asc' } }))
   .post('/todos', ({ body }) => db.todo.create({ data: body }), {
-    body: t.Object({ task: t.String() })
+    body: t.Object({ task: t.String(), description: t.String() })
   })
-  .put('/todos/:id', ({ params, body }) => 
+  .put('/todos/:id', ({ params, body }) =>
     db.todo.update({
       where: { id: Number(params.id) },
       data: body
@@ -18,7 +18,7 @@ const app = new Elysia()
     params: t.Object({ id: t.String() }),
     body: t.Object({ completed: t.Boolean() })
   })
-  .delete('/todos/:id', ({ params }) => 
+  .delete('/todos/:id', ({ params }) =>
     db.todo.delete({ where: { id: Number(params.id) } }), {
     params: t.Object({ id: t.String() })
   })

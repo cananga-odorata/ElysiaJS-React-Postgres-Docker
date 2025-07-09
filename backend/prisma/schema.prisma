@@ -8,7 +8,8 @@ datasource db {
 }
 
 model Todo {
-    id        Int     @id @default(autoincrement())
-    task      String
-    completed Boolean @default(false)
+    id          Int     @id @default(autoincrement())
+    task        String
+    description String?
+    completed   Boolean @default(false)
 }

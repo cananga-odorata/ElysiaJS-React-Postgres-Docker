@@ -21,6 +21,9 @@ services:
       - "3001:3000"
     environment:
       - DATABASE_URL=postgresql://myuser:mypassword@db:5432/mydb
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
     depends_on:
       db:
         condition: service_healthy
